@@ -1,0 +1,125 @@
+{
+  "Resources": {
+    "KeyPair": {
+      "Type": "AWS::EC2::KeyPair",
+      "Properties": {
+        "KeyName": "cloud-course"
+      }
+    },
+    "SecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupName": "my-sg-cloud-course",
+        "GroupDescription": "Access my instances",
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "IpProtocol": "tcp",
+            "FromPort": 22,
+            "ToPort": 22
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "IpProtocol": "tcp",
+            "FromPort": 8000,
+            "ToPort": 8000
+          }
+        ]
+      }
+    },
+    "InstanceRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ec2.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AdministratorAccess"
+        ],
+        "RoleName":  "InstanceRole"
+      }
+    },
+    "InstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "InstanceProfileName": "InstanceRole",
+        "Roles": [
+          {
+            "Ref": "InstanceRole"
+          }
+        ]
+      }
+    },
+    "Instance1": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "InstanceType": "t3.micro",
+        "KeyName": { "Ref": "KeyPair" },
+        "ImageId": "ami-042e8287309f5df03",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "first"
+          }
+        ],
+        "SecurityGroupIds": [ { "Ref": "SecurityGroup" } ],
+        "IamInstanceProfile": { "Ref": "InstanceRole" },
+        "UserData": {
+          "Fn::Base64": { "Fn::Join": [
+            "\n", [
+              "#!/bin/bash",
+              "curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -",
+              "sudo apt-get install -y nodejs",
+              "git clone https://github.com/omrizil1/cloud_computing_hw2.git /home/ubuntu/your-app",
+              "cd /home/ubuntu/your-app",
+              "npm install",
+              "touch logfile.log",
+              "nohup node app.js > ./logfile.log 2>&1 &"
+            ]
+          ]}
+        }
+      },
+      "DependsOn": ["InstanceProfile", "InstanceRole"]
+    },
+    "Instance2": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "InstanceType": "t3.micro",
+        "KeyName": { "Ref": "KeyPair" },
+        "ImageId": "ami-042e8287309f5df03",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "second"
+          }
+        ],
+        "SecurityGroupIds": [ { "Ref": "SecurityGroup" } ],
+        "IamInstanceProfile": { "Ref": "InstanceRole" },
+        "UserData": {
+          "Fn::Base64": { "Fn::Join": [
+            "\n", [
+              "#!/bin/bash",
+              "curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -",
+              "sudo apt-get install -y nodejs",
+              "git clone https://github.com/omrizil1/cloud_computing_hw2.git /home/ubuntu/your-app",
+              "cd /home/ubuntu/your-app",
+              "npm install",
+              "touch logfile.log",
+              "nohup node app.js > ./logfile.log 2>&1 &"
+            ]
+          ]}
+        }
+      },
+      "DependsOn": ["InstanceProfile", "InstanceRole"]
+    }
+  }
+}

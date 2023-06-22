@@ -98,7 +98,6 @@ async function getWork() {
             let workData = workObjectResponse.data
             if (workData) {
                 console.log(`got work from ${ip} the work is ${workObjectResponse.data}`)
-                lastRun = Date.now()
                 let workData = workObjectResponse.data
                 work(workData.buffer, workData.iterations)
                     .then(output => {
@@ -117,6 +116,7 @@ async function getWork() {
                     }).catch(error => {
                     console.log('Error processing work:', error);
                 });
+                lastRun = Date.now()
             }
         }
     }

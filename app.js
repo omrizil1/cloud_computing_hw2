@@ -25,8 +25,7 @@ app.put('/enqueue', (req, res) => {
         buffer,
         time : Date.now()
     })
-
-    // Perform any necessary processing with the iterations and body data
+    
     console.log('Iterations:', iterations);
     console.log('buffer:', buffer);
 
@@ -108,9 +107,9 @@ async function createWorker() {
         const keyPairName = "cloud-course";
 
         const params = {
-            ImageId: 'ami-042e8287309f5df03', // Replace with the desired AMI ID
+            ImageId: 'ami-042e8287309f5df03',
             InstanceType: 't3.micro',
-            KeyName: keyPairName, // Replace with the name of your EC2 key pair
+            KeyName: keyPairName,
             MinCount: 1,
             MaxCount: 1,
             UserData: userDataBase64,
@@ -136,9 +135,6 @@ async function createWorker() {
                         setTimeout(() => {
                             creatingWorker = false
                         },70000)
-                        // Check if the app is running by making an HTTP request
-                        const instancePublicIp = data.Reservations[0].Instances[0].PublicIpAddress;
-                        const appUrl = `http://${instancePublicIp}:8000`; // Replace with the actual app URL
                     }
                 });
             }
